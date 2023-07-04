@@ -1,6 +1,5 @@
 from matplotlib import pyplot as plt
 
-
 class BaseFuzzy():
     def __init__(self):
         self.maximum = 0
