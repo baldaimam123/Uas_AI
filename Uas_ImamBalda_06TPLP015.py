@@ -16,13 +16,13 @@ class Pressure(BaseFuzzy):
     def __init__(self):
         super().__init__()
         self.minimum = 0
-        self.maximum = 10 
+        self.maximum = 10
         self.p1 = 5
         self.p2 = 8
         self.p3 = 15
         self.p4 = 20
         self.p5 = 28
-        self.p6 = 30
+        self.p6 = 10
         self.p7 = 37
         self.p8 = 40
         self.p9 = 47
@@ -44,14 +44,12 @@ class Pressure(BaseFuzzy):
             return 0
 
     def medium(self, pressure):
-        if pressure <= self.p3 or pressure > self.p7:
+        if pressure <= self.p5 or pressure > self.p7:
             return 0
-        elif pressure <= self.p5:
-            return (pressure - self.p3) / (self.p5 - self.p3)
         elif pressure <= self.p6:
-            return 1
+            return (pressure - self.p5) / (self.p6 - self.p5)
         elif pressure <= self.p7:
-            return (self.p7 - pressure) / (self.p7 - self.p6)
+            return 1
         else:
             return 0
 
@@ -73,19 +71,7 @@ class Pressure(BaseFuzzy):
         else:
             return 0
 
-class suhu():
-    def __init__(self):
-        self.minimum = 0
-        self.maximum = 0
-
-    def up(self, x):
-        return (x - self.minimum) / (self.maximum - self.minimum)
-
-    def down(self, x):
-        return (self.maximum - x) / (self.maximum - self.minimum)
-
-
-class Suhu_Input(suhu):
+class Temperature(BaseFuzzy):
     def __init__(self):
         super().__init__()
         self.minimum = 0
@@ -131,7 +117,8 @@ class Suhu_Input(suhu):
         else:
             return 1
 
-class Speed_Output(BaseFuzzy):
+
+class Speed(BaseFuzzy):
     def __init__(self):
         super().__init__()
         self.minimum = 0
@@ -163,31 +150,67 @@ class Speed_Output(BaseFuzzy):
         else:
             return 1
 
-    def graph(self, axs, temperature, pressure):
-        x = list(range(self.minimum, self.maximum+1))
-        y_slow = [self.slow(s) for s in x]
-        y_medium = [self.medium(s) for s in x]
-        y_fast = [self.fast(s) for s in x]
-
-        axs.plot(x, y_slow, label='Slow')
-        axs.plot(x, y_medium, label='Medium')
-        axs.plot(x, y_fast, label='Fast')
-
-        axs.set_xlabel('Speed')
-        axs.set_ylabel('Membership')
-        axs.set_title('Speed Output for Temperature: ' + str(temperature) + ' and Pressure: ' + str(pressure))
-        axs.legend()
-        axs.set_xticks([0, 40, 60, 80, 100])
 
 if __name__ == "__main__":
-    temperature = float(input("Enter the temperature value: "))
-    pressure = float(input("Enter the pressure value: "))
+    temperature_value = float(input("Enter the temperature value: "))
+    pressure_value = float(input("Enter the pressure value: "))
 
-    fig, axs = plt.subplots(1, 1, figsize=(5, 5))
+    pressure_obj = Pressure()
+    temperature_obj = Temperature()
+    speed_obj = Speed()
 
-    speed_output = Speed_Output()
+    fig, axs = plt.subplots(1, 3, figsize=(15, 5))
 
-    speed_output.graph(axs, temperature, pressure)
+    x_pressure = list(range(pressure_obj.minimum, pressure_obj.maximum + 1))
+    y_pressure_very_low = [pressure_obj.very_low(p) for p in x_pressure]
+    y_pressure_low = [pressure_obj.low(p) for p in x_pressure]
+    y_pressure_medium = [pressure_obj.medium(p) for p in x_pressure]
+    y_pressure_high = [pressure_obj.high(p) for p in x_pressure]
+    y_pressure_very_high = [pressure_obj.very_high(p) for p in x_pressure]
+
+    axs[0].plot(x_pressure, y_pressure_very_low, label='Very Low')
+    axs[0].plot(x_pressure, y_pressure_low, label='Low')
+    axs[0].plot(x_pressure, y_pressure_medium, label='Medium')
+    axs[0].plot(x_pressure, y_pressure_high, label='High')
+    axs[0].plot(x_pressure, y_pressure_very_high, label='Very High')
+
+    axs[0].set_xlabel('Pressure')
+    axs[0].set_ylabel('Membership')
+    axs[0].set_title('Pressure Membership Functions')
+    axs[0].legend()
+
+    x_temperature = list(range(temperature_obj.minimum, temperature_obj.maximum + 1))
+    y_temperature_very_cold = [temperature_obj.very_cold(t) for t in x_temperature]
+    y_temperature_cold = [temperature_obj.cold(t) for t in x_temperature]
+    y_temperature_warm = [temperature_obj.warm(t) for t in x_temperature]
+    y_temperature_hot = [temperature_obj.hot(t) for t in x_temperature]
+    y_temperature_very_hot = [temperature_obj.very_hot(t) for t in x_temperature]
+
+    axs[1].plot(x_temperature, y_temperature_very_cold, label='Very Cold')
+    axs[1].plot(x_temperature, y_temperature_cold, label='Cold')
+    axs[1].plot(x_temperature, y_temperature_warm, label='Warm')
+    axs[1].plot(x_temperature, y_temperature_hot, label='Hot')
+    axs[1].plot(x_temperature, y_temperature_very_hot, label='Very Hot')
+
+    axs[1].set_xlabel('Temperature')
+    axs[1].set_ylabel('Membership')
+    axs[1].set_title('Temperature Membership Functions')
+    axs[1].legend()
+
+    x_speed = list(range(speed_obj.minimum, speed_obj.maximum + 1))
+    y_speed_slow = [speed_obj.slow(s) for s in x_speed]
+    y_speed_medium = [speed_obj.medium(s) for s in x_speed]
+    y_speed_fast = [speed_obj.fast(s) for s in x_speed]
+
+    axs[2].plot(x_speed, y_speed_slow, label='Slow')
+    axs[2].plot(x_speed, y_speed_medium, label='Medium')
+    axs[2].plot(x_speed, y_speed_fast, label='Fast')
+
+    axs[2].set_xlabel('Speed')
+    axs[2].set_ylabel('Membership')
+    axs[2].set_title('Speed Membership Functions')
+    axs[2].legend()
+    axs[2].set_xticks([0, 40, 60, 80, 100])
 
     plt.tight_layout()
     plt.show()
